@@ -69,7 +69,7 @@
 
         }
         const player = new Cuadrado(225, 225,35,35,"white"); 
-        const points = new Cuadrado(randomInteger(50), randomInteger(50),25,25,"white");
+        const points = new Cuadrado(randomInteger(20), randomInteger(20),25,25,"white");
         const car = new Cuadrado(0,40,35,35,"white");
 
 
@@ -87,16 +87,16 @@
             if (!pause) {
                 switch(e.keyCode){ 
                     case 38:
-                        y -= 40;
+                        player.y -= 40;
                         break;
                     case 40:
-                        y += 40;   
-                        break;
-                    case 39:
-                        x -= 40;
+                        player.y += 40;   
                         break;
                     case 37:
-                        x += 40;
+                        player.x -= 40;
+                        break;
+                    case 39:
+                        player.x += 40;
                         break; 
                 }  
             }
@@ -113,7 +113,7 @@
 
             if (!pause) {
                     if (player.y+40 < 0) {
-                        player.y = 550;
+                        player.y = 440;
                     }
                 
                     if (player.y+40 > 500) {
@@ -125,7 +125,7 @@
                     }
                 
                     if (player.x+40 < 0) {
-                        player.x = 940;
+                        player.x = 840;
                     }
                 
             
@@ -152,32 +152,10 @@
                     score+=10
                 }
 
-                if(car.seTocan(player)){
-                    if(car.x === player.x || car.y === player.y)
-                    ctx.gameOver();
+                if(player.seTocan(car)){
+                    if(car.x == player.x || car.y == player.y)
+                    gameOver();
                 }
-
-                for (var i = police.length - 1; i >= 0; i--) { 
-
-                    if (player.seTocan(police[i])) {
-                        
-
-                        if (dir == 1) {
-                            player.y+=speed;
-                        }
-                        if (dir == 2) {
-                            player.y-=speed;
-                        }
-                        if (dir == 3) {
-                            player.x-=speed;
-                        }
-                        if (dir == 4) {
-                            player.x+=speed;
-                        }
-                        dir = 0;
-                    }
-                } 
-
             } 
 
             paint(); 
@@ -214,8 +192,10 @@
             
             player.paint(ctx);
             //ctx.drawImage(policia,player.x,player.y,100,100);
+            //points.paint(ctx);
             ctx.drawImage(cartera,points.x,points.y,25,25);
             ctx.drawImage(policia,car.x+=5,40,100,50);
+            ctx.drawImage(policia,car.x,40,100,50);
             ctx.drawImage(policia,car.x,90,100,50);
             ctx.drawImage(policia,car.x,190,100,50);
             ctx.drawImage(policia,car.x,240,100,50);
