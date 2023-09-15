@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,12 +14,241 @@
     </style>
 </head>
 <body>
+        
     <center>
-        <canvas width="900" height="500" id="miCanvas"></canvas>
+        <canvas width="900" height="500" id="myCanvas"></canvas>
     </center>
+
+
     <script>
-            var canvas = document.getElementById('miCanvas');
-            var ctx = canvas.getContext('2d');
+        
+        
+        var canvas = document.getElementById('myCanvas');
+        var ctx = canvas.getContext('2d');
+        var  dir = 0, speed = 10;
+        let score = 0;
+        xCar=0;
+        let police = [];
+        let pause = false;
+        let carretera = new Image();
+        let policia = new Image();
+        let cartera = new Image();
+
+        carretera.src = "Carretera.jpg";
+        policia.src = "Policia.png";
+        cartera.src = "Cartera.png";
+
+        class Cuadrado{
+
+            constructor(x,y,w,h,c){
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.c = c;
+            }
+
+            paint(ctx){
+
+                ctx.fillStyle = this.c;
+                ctx.fillRect(this.x,this.y,this.w,this.h);
+                ctx.strokeRect(this.x,this.y,this.w,this.h);
+
+            }
+
+            seTocan(otro){
+                if(this.x < otro.x + otro.w &&  
+                   this.x + this.w > otro.x &&  
+                   this.y < otro.y + otro.h &&   
+                   this.y + this.h > otro.y  ) 
+                { 
+                    return true;   
+                }
+                return false;
+            }
+
+        }
+        const player = new Cuadrado(225, 225,35,35,"white"); 
+        const points = new Cuadrado(randomInteger(50), randomInteger(50),25,25,"white");
+        const car = new Cuadrado(0,40,35,35,"white");
+
+
+        window.requestAnimationFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 17);
+                };
+        }());
+        
+        document.addEventListener("keydown", (e) =>{
+
+            if (!pause) {
+                switch(e.keyCode){ 
+                    case 38:
+                        y -= 40;
+                        break;
+                    case 40:
+                        y += 40;   
+                        break;
+                    case 39:
+                        x -= 40;
+                        break;
+                    case 37:
+                        x += 40;
+                        break; 
+                }  
+            }
+
+            switch(e.keyCode){  
+                case 32:
+                    pause = !pause;
+                break;  
+            }
+
+        })
+
+        function update(){ 
+
+            if (!pause) {
+                    if (player.y+40 < 0) {
+                        player.y = 550;
+                    }
+                
+                    if (player.y+40 > 500) {
+                        player.y = -40;
+                    }
+                
+                    if (player.x+40 > 900) {
+                        player.x = -40;
+                    }
+                
+                    if (player.x+40 < 0) {
+                        player.x = 940;
+                    }
+                
+            
+                if (!pause) {
+                    if (car.y+50 < 0) {
+                        car.y = 550;
+                    }
+                
+                    if (car.y+50 > 500) {
+                        car.y = -50;
+                    }
+            
+                    if (car.x+50 > 900) {
+                        car.x = -50;
+                    }
+                    if (car.x+50 < 0) {
+                        car.x = 950;
+                    }
+                } 
+            
+                if (player.seTocan(points)) {
+                    points.x = randomInteger(800);
+                    points.y = randomInteger(800);
+                    score+=10
+                }
+
+                if(car.seTocan(player)){
+                    if(car.x === player.x )
+                    ctx.gameOver();
+                }
+
+                for (var i = police.length - 1; i >= 0; i--) { 
+
+                    if (player.seTocan(police[i])) {
+                        
+
+                        if (dir == 1) {
+                            player.y+=speed;
+                        }
+                        if (dir == 2) {
+                            player.y-=speed;
+                        }
+                        if (dir == 3) {
+                            player.x-=speed;
+                        }
+                        if (dir == 4) {
+                            player.x+=speed;
+                        }
+                        dir = 0;
+                    }
+                } 
+
+            } 
+
+            paint(); 
+            window.requestAnimationFrame(update); 
+        }
+
+        function paint()
+        {
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(0,0,900,500);
+
+            ctx.fillStyle = "gray";
+            ctx.fillRect(0,0,900,50);
+
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText("SCORE: "+score, 5, 20);
+
+            
+            ctx.drawImage(carretera,0,50,900,100);
+            ctx.drawImage(carretera,0,200,900,100);
+            ctx.drawImage(carretera,0,350,900,100);
+            ctx.drawImage(carretera,0,50,900,100);
+
+
+
+            ctx.fillStyle = "green";
+            ctx.fillRect(0,150,900,50);
+            ctx.fillRect(0,300,900,50);
+
+            ctx.fillStyle = "gray";
+            ctx.fillRect(0,450,900,50);
+            
+            player.paint(ctx);
+            //ctx.drawImage(policia,player.x,player.y,100,100);
+            ctx.drawImage(cartera,points.x,points.y,25,25);
+            ctx.drawImage(policia,car.x+=5,40,100,50);
+            ctx.drawImage(policia,car.x,90,100,50);
+            ctx.drawImage(policia,car.x,190,100,50);
+            ctx.drawImage(policia,car.x,240,100,50);
+            ctx.drawImage(policia,car.x,340,100,50);
+            ctx.drawImage(policia,car.x,390,100,50);
+
+            for (var i = police.length - 1; i >= 0; i--) {
+                police[i].paint(ctx);
+            }
+
+            if (pause) {
+
+                ctx.fillStyle = "rgba(154,160,154,0.5)";
+                ctx.fillRect(0,0,900,500);
+
+                ctx.font = "40px Georgia";
+                ctx.fillStyle = "black";
+                ctx.fillText("P A U S E", 350, 230);
+            }
+        }
+        update();
+        function randomInteger(max) {
+            return Math.floor(Math.random()*(max + 1));
+        } 
+
+        function gameOver(){
+            ctx.fillStyle = "rgba(154,160,154,0.5)";
+            ctx.fillRect(0,0,900,500);
+
+            ctx.font = "40px Georgia";
+            ctx.fillStyle = "black";
+            ctx.fillText("Game Over", 350, 230);
+        }
     </script>
 </body>
 </html>
