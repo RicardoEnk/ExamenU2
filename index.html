@@ -14,33 +14,39 @@
     </style>
 </head>
 <body>
-        
     <center>
-        <canvas width="900" height="500" id="myCanvas"></canvas>
+        <canvas width="900" height="600" id="myCanvas"></canvas>
     </center>
 
-
     <script>
-        
-        
         var canvas = document.getElementById('myCanvas');
         var ctx = canvas.getContext('2d');
-        var  dir = 0, speed = 10;
+        let perdio = false;
         let score = 0;
-        xCar=0;
         let police = [];
         let pause = false;
         let carretera = new Image();
         let policia = new Image();
         let cartera = new Image();
+        let ladron = new Image();
+        let fondo = new Image();
+        let fondoAbajo = new Image();
+        let sonido = new Audio();
+        let musica = new Audio();
 
+
+
+        ladron.src = "Ladron.png";
         carretera.src = "Carretera.jpg";
         policia.src = "Policia.png";
         cartera.src = "Cartera.png";
+        fondo.src = "Fondo.png";
+        fondoAbajo.src = "Fondo-2.png";
+        musica.src = "Musica.mp3";
+        sonido.src = "Dinero.mp3";
 
-        class Cuadrado{
-
-            constructor(x,y,w,h,c){
+        class Cuadrado {
+            constructor(x, y, w, h, c) {
                 this.x = x;
                 this.y = y;
                 this.w = w;
@@ -48,30 +54,37 @@
                 this.c = c;
             }
 
-            paint(ctx){
-
+            paint(ctx) {
                 ctx.fillStyle = this.c;
-                ctx.fillRect(this.x,this.y,this.w,this.h);
-                ctx.strokeRect(this.x,this.y,this.w,this.h);
-
+                ctx.fillRect(this.x, this.y, this.w, this.h);
+                ctx.strokeRect(this.x, this.y, this.w, this.h);
             }
 
-            seTocan(otro){
-                if(this.x < otro.x + otro.w &&  
-                   this.x + this.w > otro.x &&  
-                   this.y < otro.y + otro.h &&   
-                   this.y + this.h > otro.y  ) 
-                { 
-                    return true;   
+            seTocan(otro) {
+                if (this.x < otro.x + otro.w &&
+                    this.x + this.w > otro.x &&
+                    this.y < otro.y + otro.h &&
+                    this.y + this.h > otro.y) {
+                    return true;
                 }
                 return false;
             }
-
         }
-        const player = new Cuadrado(225, 225,35,35,"white"); 
-        const points = new Cuadrado(randomInteger(20), randomInteger(20),25,25,"white");
-        const car = new Cuadrado(0,40,35,35,"white");
 
+        const player = new Cuadrado(400, 500, 50, 50, "white");
+        const points = new Cuadrado(randomInteger(300), randomInteger(300), 50, 50, "white");
+
+        const cars = [];
+        cars.push(new Cuadrado(randomInteger(900), 85, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 135, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 285, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 330, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 385, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 435, 40, 40, "white"));
+
+        var animacionID;
+
+        const speed = 2;
 
         window.requestAnimationFrame = (function () {
             return window.requestAnimationFrame ||
@@ -81,154 +94,160 @@
                     window.setTimeout(callback, 17);
                 };
         }());
-        
-        document.addEventListener("keydown", (e) =>{
 
+        document.addEventListener("keydown", (e) => {
             if (!pause) {
-                switch(e.keyCode){ 
+                switch (e.keyCode) {
                     case 38:
                         player.y -= 40;
                         break;
                     case 40:
-                        player.y += 40;   
+                        player.y += 40;
                         break;
                     case 37:
                         player.x -= 40;
                         break;
                     case 39:
                         player.x += 40;
-                        break; 
-                }  
+                        break;
+                }
             }
 
-            switch(e.keyCode){  
+            switch (e.keyCode) {
                 case 32:
                     pause = !pause;
-                break;  
+                    break;
+                case 13:
+                    if (perdio) {
+                        perdio = false;
+                        score = 0;
+                        start();
+                    }
+                    break;
             }
+        });
 
-        })
-
-        function update(){ 
-
-            if (!pause) {
-                    if (player.y+40 < 0) {
-                        player.y = 440;
-                    }
-                
-                    if (player.y+40 > 500) {
-                        player.y = -40;
-                    }
-                
-                    if (player.x+40 > 900) {
-                        player.x = -40;
-                    }
-                
-                    if (player.x+40 < 0) {
-                        player.x = 840;
-                    }
-                
-            
-                if (!pause) {
-                    if (car.y+50 < 0) {
-                        car.y = 550;
-                    }
-                
-                    if (car.y+50 > 500) {
-                        car.y = -50;
-                    }
-            
-                    if (car.x+50 > 900) {
-                        car.x = -50;
-                    }
-                    if (car.x+50 < 0) {
-                        car.x = 950;
-                    }
-                } 
-            
-                if (player.seTocan(points)) {
-                    points.x = randomInteger(800);
-                    points.y = randomInteger(800);
-                    score+=10
-                }
-
-                if(player.seTocan(car)){
-                    if(car.x == player.x || car.y == player.y)
-                    gameOver();
-                }
-            } 
-
-            paint(); 
-            window.requestAnimationFrame(update); 
+        function start() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animacionID = window.requestAnimationFrame(update);
         }
 
-        function paint()
-        {
+        function gameOver() {
+            window.cancelAnimationFrame(animacionID);
+        }
+
+        function update() {
+            musica.play();
+            if (!pause) {
+                if (player.y + 70 < 0) {
+                    player.y = 570;
+                }
+
+                if (player.y + 70 > 600) {
+                    player.y = -70;
+                }
+
+                if (player.x + 70 > 900) {
+                    player.x = -70;
+                }
+
+                if (player.x + 70 < 0) {
+                    player.x = 870;
+                }
+
+                for (let i = 0; i < cars.length; i++) {
+                    if (cars[i].y + 50 < 0) {
+                        cars[i].y = 550;
+                    }
+
+                    if (cars[i].y + 50 > 600) {
+                        cars[i].y = -50;
+                    }
+
+                    if (cars[i].x + 50 > 900) {
+                        cars[i].x = -50;
+                    }
+                    if (cars[i].x + 50 < 0) {
+                        cars[i].x = 950;
+                    }
+                }
+
+                for (let i = 0; i < cars.length; i++) {
+                    if (player.seTocan(cars[i])) {
+                        perdio = true;
+                        gameOver();
+                    }
+                }
+
+                if (player.seTocan(points)) {
+                    points.x = randomInteger(500);
+                    points.y = randomInteger(500);
+                    score += 10
+                    sonido.play();
+                }
+            }
+
+            paint();
+            window.requestAnimationFrame(update);
+            
+        }
+        function paint() {
 
             ctx.fillStyle = "white";
-            ctx.fillRect(0,0,900,500);
+            ctx.fillRect(0, 0, 900, 600);
 
-            ctx.fillStyle = "gray";
-            ctx.fillRect(0,0,900,50);
+            ctx.drawImage(fondo,0,0,900,121);
+            ctx.drawImage(fondoAbajo,0,379,900,300);
+
 
             ctx.font = "20px Arial";
             ctx.fillStyle = "black";
-            ctx.fillText("SCORE: "+score, 5, 20);
-
-            
-            ctx.drawImage(carretera,0,50,900,100);
-            ctx.drawImage(carretera,0,200,900,100);
-            ctx.drawImage(carretera,0,350,900,100);
-            ctx.drawImage(carretera,0,50,900,100);
+            ctx.fillText("SCORE: " + score, 10, 30);
 
 
-
-            ctx.fillStyle = "green";
-            ctx.fillRect(0,150,900,50);
-            ctx.fillRect(0,300,900,50);
+            ctx.drawImage(carretera, 0, 90, 900, 100);
+            ctx.drawImage(carretera, 0, 290, 900, 100);
+            ctx.drawImage(carretera, 0, 390, 900, 100);
 
             ctx.fillStyle = "gray";
-            ctx.fillRect(0,450,900,50);
-            
-            player.paint(ctx);
-            //ctx.drawImage(policia,player.x,player.y,100,100);
-            //points.paint(ctx);
-            ctx.drawImage(cartera,points.x,points.y,25,25);
-            ctx.drawImage(policia,car.x+=5,40,100,50);
-            ctx.drawImage(policia,car.x,40,100,50);
-            ctx.drawImage(policia,car.x,90,100,50);
-            ctx.drawImage(policia,car.x,190,100,50);
-            ctx.drawImage(policia,car.x,240,100,50);
-            ctx.drawImage(policia,car.x,340,100,50);
-            ctx.drawImage(policia,car.x,390,100,50);
+            ctx.drawImage(fondoAbajo,0, 168, 900, 150);
 
-            for (var i = police.length - 1; i >= 0; i--) {
-                police[i].paint(ctx);
+
+            ctx.drawImage(cartera, points.x, points.y, 25, 25);
+            ctx.drawImage(ladron, player.x, player.y, 70, 70);
+
+            for (let i = 0; i < cars.length; i++) {
+                ctx.drawImage(policia, cars[i].x += speed, cars[i].y, 100, 50);
             }
 
             if (pause) {
-
                 ctx.fillStyle = "rgba(154,160,154,0.5)";
-                ctx.fillRect(0,0,900,500);
+                ctx.fillRect(0, 0, 900, 600);
 
                 ctx.font = "40px Georgia";
                 ctx.fillStyle = "black";
                 ctx.fillText("P A U S E", 350, 230);
             }
+
+            if (perdio) {
+                ctx.fillStyle = "rgba(154,160,154,0.5)";
+                ctx.fillRect(0, 0, 900, 600);
+
+                ctx.font = "40px Georgia";
+                ctx.fillStyle = "black";
+                ctx.fillText("Game Over", 350, 230);
+            }
         }
-        update();
+
         function randomInteger(max) {
-            return Math.floor(Math.random()*(max + 1));
-        } 
-
-        function gameOver(){
-            ctx.fillStyle = "rgba(154,160,154,0.5)";
-            ctx.fillRect(0,0,900,500);
-
-            ctx.font = "40px Georgia";
-            ctx.fillStyle = "black";
-            ctx.fillText("Game Over", 350, 230);
+            return Math.floor(Math.random() * (max + 1));
         }
+
+        window.addEventListener('load', () => {
+            start();
+        });
+
     </script>
 </body>
+
 </html>
