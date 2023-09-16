@@ -23,6 +23,7 @@
         var ctx = canvas.getContext('2d');
         let perdio = false;
         let score = 0;
+        let tiempo = 60;
         let police = [];
         let pause = false;
         let carretera = new Image();
@@ -75,12 +76,12 @@
         const points = new Cuadrado(randomInteger(300), randomInteger(300), 50, 50, "white");
 
         const cars = [];
-        cars.push(new Cuadrado(randomInteger(900), 85, 40, 40, "white"));
-        cars.push(new Cuadrado(randomInteger(900), 135, 40, 40, "white"));
-        cars.push(new Cuadrado(randomInteger(900), 285, 40, 40, "white"));
-        cars.push(new Cuadrado(randomInteger(900), 330, 40, 40, "white"));
-        cars.push(new Cuadrado(randomInteger(900), 385, 40, 40, "white"));
-        cars.push(new Cuadrado(randomInteger(900), 435, 40, 40, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 85, 30, 30, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 135, 30, 30, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 285, 30, 30, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 330, 30, 30, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 385, 30, 30, "white"));
+        cars.push(new Cuadrado(randomInteger(900), 435, 30, 30, "white"));
 
         var animacionID;
 
@@ -134,25 +135,30 @@
 
         function gameOver() {
             window.cancelAnimationFrame(animacionID);
+            tiempo = 0;
         }
+
+        const timer = setInterval(()=>  {
+            tiempo--;
+        },1000);
 
         function update() {
             musica.play();
             if (!pause) {
-                if (player.y + 70 < 0) {
-                    player.y = 570;
+                if (player.y + 50 < 0) {
+                    player.y = 550;
                 }
 
-                if (player.y + 70 > 600) {
-                    player.y = -70;
+                if (player.y + 50 > 600) {
+                    player.y = -50;
                 }
 
-                if (player.x + 70 > 900) {
-                    player.x = -70;
+                if (player.x + 50 > 900) {
+                    player.x = -50;
                 }
 
-                if (player.x + 70 < 0) {
-                    player.x = 870;
+                if (player.x + 50 < 0) {
+                    player.x = 950;
                 }
 
                 for (let i = 0; i < cars.length; i++) {
@@ -172,6 +178,12 @@
                     }
                 }
 
+                if (tiempo <= 0) {
+                    perdio = true;
+                    tiempo=0;
+                    gameOver();
+                }
+
                 for (let i = 0; i < cars.length; i++) {
                     if (player.seTocan(cars[i])) {
                         perdio = true;
@@ -182,7 +194,8 @@
                 if (player.seTocan(points)) {
                     points.x = randomInteger(500);
                     points.y = randomInteger(500);
-                    score += 10
+                    score += 10;
+                    tiempo += 5;
                     sonido.play();
                 }
             }
@@ -203,6 +216,10 @@
             ctx.font = "20px Arial";
             ctx.fillStyle = "black";
             ctx.fillText("SCORE: " + score, 10, 30);
+
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText("TIEMPO: "+ tiempo,750, 30);
 
 
             ctx.drawImage(carretera, 0, 90, 900, 100);
@@ -226,7 +243,7 @@
 
                 ctx.font = "40px Georgia";
                 ctx.fillStyle = "black";
-                ctx.fillText("P A U S E", 350, 230);
+                ctx.fillText("P A U S E", 350, 300);
             }
 
             if (perdio) {
@@ -235,7 +252,7 @@
 
                 ctx.font = "40px Georgia";
                 ctx.fillStyle = "black";
-                ctx.fillText("Game Over", 350, 230);
+                ctx.fillText("GAME OVER", 330, 280);
             }
         }
 
