@@ -138,9 +138,9 @@
             tiempo = 0;
         }
 
-        const timer = setInterval(()=>  {
+        const timer = setInterval(() => {
             tiempo--;
-        },1000);
+        }, 1000);
 
         function update() {
             musica.play();
@@ -180,7 +180,7 @@
 
                 if (tiempo <= 0) {
                     perdio = true;
-                    tiempo=0;
+                    tiempo = 0;
                     gameOver();
                 }
 
@@ -202,15 +202,15 @@
 
             paint();
             window.requestAnimationFrame(update);
-            
+
         }
         function paint() {
 
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, 900, 600);
 
-            ctx.drawImage(fondo,0,0,900,121);
-            ctx.drawImage(fondoAbajo,0,379,900,300);
+            ctx.drawImage(fondo, 0, 0, 900, 121);
+            ctx.drawImage(fondoAbajo, 0, 379, 900, 300);
 
 
             ctx.font = "20px Arial";
@@ -219,7 +219,7 @@
 
             ctx.font = "20px Arial";
             ctx.fillStyle = "black";
-            ctx.fillText("TIEMPO: "+ tiempo,750, 30);
+            ctx.fillText("TIEMPO: " + tiempo, 750, 30);
 
 
             ctx.drawImage(carretera, 0, 90, 900, 100);
@@ -227,7 +227,7 @@
             ctx.drawImage(carretera, 0, 390, 900, 100);
 
             ctx.fillStyle = "gray";
-            ctx.drawImage(fondoAbajo,0, 168, 900, 150);
+            ctx.drawImage(fondoAbajo, 0, 168, 900, 150);
 
 
             ctx.drawImage(cartera, points.x, points.y, 25, 25);
